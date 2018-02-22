@@ -2,4 +2,26 @@
 
 {% block body %}
  <h1>Dashboard<small>Welcome {{session.username}} </small></h1>
+ <a class="btn btn-success" href="/add_list">Add List</a>
+ <hr>
+ <table class="table table-striped">
+ 	<tr>
+ 		<th>ID</th>
+ 		<th>Item</th>
+ 		<th>Price</th>
+ 		<th>Quantity</th>
+ 		<th></th>
+ 		<th></th>
+ 	</tr>
+ 	{% for list in lists %}
+ 	<tr>
+ 		<td>{{list.id}}</td>
+ 		<td>{{list.item}}</td>
+ 		<td>{{list.price}}</td>
+ 		<td>{{list.quantity}}</td>
+ 		<td><a href="edit_list/{{list.id}}" class="btn btn-default pull-right">Edit</a></td>
+ 		<td></td>
+ 	</tr>
+ 	{% endfor %}
+ </table>
 {% endblock %}

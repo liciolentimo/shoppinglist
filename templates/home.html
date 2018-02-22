@@ -4,6 +4,9 @@
 <div class="jumbotron text-center">
 	<h1>Shopping List</h1>
 	<p class="lead">This is a web app to create, edit and share your shopping lists.</p>
-	
+	{% if session.logged_in == NULL %}
+	<a href="/register" class="btn btn-primary btn-lg">Register</a>
+	<a href="/login" class="btn btn-success btn-lg">Login</a>
+	{% endif %}
 </div>
 {% endblock %}

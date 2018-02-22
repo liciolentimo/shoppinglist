@@ -1,6 +1,6 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request
 from flask_mysqldb import MySQL
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators
+from wtforms import Form, StringField, TextAreaField, PasswordField, validators, IntegerField
 from passlib.hash import sha256_crypt
 from functools import wraps
 
@@ -23,6 +23,11 @@ def index():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+#Single list
+@app.route('/lists')
+def lists():
+	return render_template('lists.html')    
 
 class RegisterForm(Form):
 	name = StringField('Name', [validators.Length(min=1,max=50)])
@@ -108,6 +113,7 @@ def is_logged_in(f):
 
 #Logout
 @app.route('/logout')
+@is_logged_in
 def logout():
 	session.clear()
 	flash('You are now logged out', 'success')
@@ -117,7 +123,54 @@ def logout():
 @app.route('/dashboard')
 @is_logged_in
 def dashboard():
-	return render_template('dashboard.html')				   	
+	#create cursor
+	cur = mysql.connection.cursor()
+
+	#Get lists
+	result = cur.execute("SELECT * FROM lists")
+
+	lists = cur.fetchall()
+
+	if result > 0:
+		return render_template('dashboard.html', lists=lists)
+	else:
+		msg = 'No lists found'	
+		return render_template('dashboard.html', msg=msg)
+	#close connection
+	cur.close()	
+
+#List form class
+class ListForm(Form):
+	item = StringField('Item', [validators.Length(min=1,max=200)])
+	price = IntegerField('Price')
+	quantity = StringField('Quantity', [validators.Length(max=200)])	
+
+#Add list
+@app.route('/add_list',methods=['GET','POST'])
+@is_logged_in
+def add_list():
+	form = ListForm(request.form)
+	if request.method == 'POST' and form.validate():
+		item = form.item.data
+		price = form.price.data
+		quantity = form.quantity.data 
+
+		#create cursor
+		cur = mysql.connection.cursor()
+
+		cur.execute("INSERT INTO lists(item, price, quantity) VALUES(%s, %s, %s)",(item, price, quantity))
+
+		#Commit to DB
+		mysql.connection.commit()
+
+		#close connection
+		cur.close()
+
+		flash('Shopping List created', 'success')
+
+		return redirect(url_for('dashboard'))
+
+	return render_template('add_list.html', form=form)				   	
 
 
 if __name__ == '__main__':
