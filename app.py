@@ -170,7 +170,66 @@ def add_list():
 
 		return redirect(url_for('dashboard'))
 
-	return render_template('add_list.html', form=form)				   	
+	return render_template('add_list.html', form=form)	
+
+#Edit list
+@app.route('/edit_list/<string:id>',methods=['GET','POST'])
+@is_logged_in
+def edit_list(id):
+
+	#create cursor
+	cur = mysql.connection.cursor()
+
+	#Get list by id
+	result = cur.execute("SELECT * FROM lists WHERE id=%s", [id])
+
+	list = cur.fetchone()
+
+	form = ListForm(request.form)
+
+	#Populate list form fields
+	form.item.data = list['item']
+	form.price.data = list['price']
+	form.quantity.data = list['quantity']
+
+	if request.method == 'POST' and form.validate():
+		item = request.form['item']
+		price = request.form['price']
+		quantity = request.form['quantity'] 
+
+		#create cursor
+		cur = mysql.connection.cursor()
+
+		cur.execute("UPDATE lists SET item=%s, price=%s, quantity=%s WHERE id=%s",(item,price,quantity,id))
+
+		#Commit to DB
+		mysql.connection.commit()
+
+		#close connection
+		cur.close()
+
+		flash('Shopping List updated', 'success')
+
+		return redirect(url_for('dashboard'))
+
+	return render_template('edit_list.html', form=form)	
+
+#Delete list
+@app.route('/delete_list/<string:id>', methods=['POST'])
+@is_logged_in
+def delete_list(id):
+	#create cursor
+	cur = mysql.connection.cursor()
+
+	cur.execute("DELETE FROM lists WHERE id=%s", [id])
+
+	mysql.connection.commit()
+
+	cur.close()
+
+	flash('Shopping List deleted','success')
+
+	return redirect(url_for('dashboard'))				   	
 
 
 if __name__ == '__main__':
