@@ -1,4 +1,4 @@
-# shoppinglist
+# Shopping List
 This is a web app to enable users add, edit. delete and share shopping lists
 
 # Prerequisites
@@ -11,3 +11,6 @@ Please ensure you have the following installed (Windows):
 After installing XAMPP, create a database and name it shoppinglist.
 <p>Create a table users with the following attributes: id as the Primary Key, name, username, email, password and register_date.</p>
 <p>Create a table lists with the following attributes: id as the Primary Key, item, price, quantity and create date.</p>
+
+#Flask
+<p> After setting up your virtual environment, run Command prompt and navigate to the project location and run python app.py
